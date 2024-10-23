@@ -1,0 +1,34 @@
+form{
+    max-width: 700px;
+    display: flex;
+    margin: auto;
+}
+form input{
+    flex-grow: 1;
+}
+
+.toDoItems{
+    max-width: 700px;
+    margin: auto;
+}
+
+.toDoItems ul{
+    text-align: left;
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+}
+.toDoItems ul li{
+    font-size:18px;
+   position: relative;
+    padding: 5px 10px;
+    margin: 0px;
+    margin-top: 10px;
+    background-color:blueviolet;
+}
+.toDoItems ul li span{
+    position: absolute;
+    font-size: 18px;
+    cursor: pointer;
+    right: 10px;
+}
