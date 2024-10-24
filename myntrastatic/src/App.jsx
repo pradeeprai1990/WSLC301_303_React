@@ -7,19 +7,11 @@ import Header from './common/Header'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios'
 function App() {
-
-  let [filterParams, setFilterParams] = useState({
-    page: 1,
-    limit: 12,
-    categories: '',
-    brands: '',
-    price_from: '',
-    price_to: '',
-    discount_from: '',
-    discount_to: '',
-    rating: 'null',
-    sorting: 'null'
-  })
+  let [allCatSlug,setAllcategorslug]=useState([])
+  let [allbrandSlug,setAllbrandSlug]=useState([])
+  let [sorting,setSorting]=useState(null)
+  let [rating,setRating]=useState(null)
+  let [priceFilter,setPriceFilter]=useState(['',''])
 
   let [category, setCatgory] = useState([])
   let [brand, setBrand] = useState([])
@@ -42,7 +34,20 @@ function App() {
 
   let getProduct = () => {
     axios.get(`https://wscubetech.co/ecommerce-api/products.php`, {
-      params: filterParams
+
+      params: {
+        page: 1,
+        limit: 30,
+        categories:allCatSlug.toString(),
+        brands: allbrandSlug.toString(),
+        price_from: priceFilter[0],
+        price_to: priceFilter[1],
+        discount_from: '',
+        discount_to: '',
+        rating:rating,
+        sorting
+      }
+
     })
       .then((res) => res.data)
       .then((finalRes) => {
@@ -58,7 +63,48 @@ function App() {
 
   useEffect(() => {
     getProduct()
-  }, [filterParams])
+  }, [allCatSlug,allbrandSlug,sorting,priceFilter,rating])
+
+  
+ 
+  let getCategoryslug=(event)=>{
+      if(event.target.checked){
+        if(! allCatSlug.includes(event.target.value)){
+          setAllcategorslug([...allCatSlug,event.target.value])
+        }
+       
+        
+      }
+      else{
+
+        let filterData=allCatSlug.filter((items)=>items!=event.target.value)
+        
+        setAllcategorslug(filterData)
+      }
+
+  }
+
+
+
+  let getallBrandSlug=(event)=>{
+     if(event.target.checked){
+          if(!allbrandSlug.includes(event.target.value)){
+             setAllbrandSlug([...allbrandSlug,event.target.value])
+          }
+     }
+     else{
+        let removeUcheckbrandslug=allbrandSlug.filter((items)=>items!=event.target.value)
+        setAllbrandSlug(removeUcheckbrandslug)
+    
+      }
+
+
+  }
+  // useEffect(()=>{
+  //     console.log(allCatSlug)
+  // },[allCatSlug])
+
+
   return (
     <>
       <Header />
@@ -97,14 +143,14 @@ function App() {
               >
 
 
-                <Dropdown.Item>Name :  A to Z</Dropdown.Item>
-                <Dropdown.Item>Name : Z to A</Dropdown.Item>
-                <Dropdown.Item>Price : Low to High</Dropdown.Item>
-                <Dropdown.Item>Price : High to Low</Dropdown.Item>
-                <Dropdown.Item>Discounted Price : Low to High</Dropdown.Item>
-                <Dropdown.Item>Discounted Price : High to Low</Dropdown.Item>
-                <Dropdown.Item>Rating : Low to High</Dropdown.Item>
-                <Dropdown.Item>Rating : High to Low</Dropdown.Item>
+                <Dropdown.Item onClick={()=>setSorting(1)}>Name :  A to Z</Dropdown.Item>
+                <Dropdown.Item onClick={()=>setSorting(2)}>Name : Z to A</Dropdown.Item>
+                <Dropdown.Item onClick={()=>setSorting(3)}> Price : Low to High</Dropdown.Item>
+                <Dropdown.Item onClick={()=>setSorting(4)}>Price : High to Low</Dropdown.Item>
+                <Dropdown.Item onClick={()=>setSorting(5)}>Discounted Price : Low to High</Dropdown.Item>
+                <Dropdown.Item onClick={()=>setSorting(6)}>Discounted Price : High to Low</Dropdown.Item>
+                <Dropdown.Item onClick={()=>setSorting(7)}>Rating : Low to High</Dropdown.Item>
+                <Dropdown.Item onClick={()=>setSorting(8)}>Rating : High to Low</Dropdown.Item>
 
               </DropdownButton>
             </Dropdown>
@@ -124,7 +170,7 @@ function App() {
                   category.map((items, index) => {
 
                     return (
-                      <li><input type='checkbox' value={items.slug} />{items.name}<span className='item_count'></span></li>
+                      <li><input type='checkbox' onChange={getCategoryslug} value={items.slug} />{items.name}<span className='item_count'></span></li>
                     )
                   })
                   :
@@ -143,7 +189,7 @@ function App() {
                   brand.map((items, index) => {
 
                     return (
-                      <li><input type='checkbox' value={items.slug} />{items.name}<span className='item_count'></span></li>
+                      <li><input onChange={getallBrandSlug} type='checkbox' value={items.slug} />{items.name}<span className='item_count'></span></li>
                     )
                   })
                   :
@@ -157,12 +203,12 @@ function App() {
 
             <div className='cat_items'>
               <h2>PRICE</h2>
-              <ul>
-                <li><input type='checkbox' />Rs. 314 to Rs. 736<span className='item_count'>(1795)</span></li>
-                <li><input type='checkbox' />Rs. 736 to Rs. 1158<span className='item_count'>(445)</span></li>
-                <li><input type='checkbox' />Rs. 1158 to Rs. 1580<span className='item_count'>(50)</span></li>
-                <li><input type='checkbox' />Rs. 1580 to Rs. 2002<span className='item_count'>(24)</span></li>
-              </ul>
+                <ul>
+                  <li><label><input type="radio" name="money" onChange={()=>setPriceFilter([10,250])}/>Rs. 10 to Rs. 250</label></li>
+                  <li><label><input type="radio" name="money" onChange={()=>setPriceFilter([250,500])}/>Rs. 250 to Rs. 500</label></li>
+                  <li><label><input type="radio" name="money" onChange={()=>setPriceFilter([500,1000])} />Rs. 500 to Rs. 1000</label></li>
+                  <li><label><input type="radio" name="money" onChange={()=>setPriceFilter([1000,''])}/>Rs. 1000 to Above</label></li>
+                </ul>
             </div>
 
             <div className='cat_items'>
@@ -179,17 +225,17 @@ function App() {
               <h2>Rating</h2>
               <ul>
                 <li class="pointer">
-                  <label><input type="radio" name="rating"/>4★ &amp; above</label>
+                  <label><input type="radio" name="rating" onClick={()=>setRating(4)}/>4★ &amp; above</label>
                   </li>
                   <li class="pointer">
                     <label>
-                      <input type="radio" name="rating"/>
+                      <input type="radio" name="rating" onClick={()=>setRating(3)}/>
                       3★ &amp; above</label></li>
 
-                      <li class="pointer"><label><input type="radio" name="rating"/>2★ &amp; above</label></li>
+                      <li class="pointer"><label><input type="radio" name="rating" onClick={()=>setRating(2)}/>2★ &amp; above</label></li>
                       
                       
-                      <li class="pointer"><label><input type="radio" name="rating"/>1★ &amp; above</label></li></ul></div>
+                      <li class="pointer"><label><input type="radio" name="rating" onClick={()=>setRating(1)}/>1★ &amp; above</label></li></ul></div>
 
 
 
@@ -212,9 +258,8 @@ function App() {
                             <Card.Title>{name}</Card.Title>
                             <Card.Text>
                               <p>{description}</p>
-                              <span className='product-discountedPrice'>{price}</span>
-                              <span className='product-strike'>Rs. 1499</span>
-                              <span className='product-discountPercentage'>(56% OFF)</span>
+                              <span className='product-discountedPrice'>Rs. {price}</span>
+                              
                             </Card.Text>
                           </Card.Body>
                         </Card>
